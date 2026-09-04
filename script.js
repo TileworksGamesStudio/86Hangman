@@ -2,18 +2,14 @@
 /**
  * BAR HANGMAN — Master Production Engine
  * Complete 5-Example Playthrough & Professional Bartender Knowledge System.
- * Self-contained static web application.
+ * Self-contained static web application with robust localStorage persistence & main menu hub.
  */
 
 'use strict';
 
 /* ==========================================================================
-   1. SCRIPT.JS CONTENT DATA ARCHITECTURE (EXACTLY 5 PLAYABLE EXAMPLES)
+   1. CONTENT DATA ARCHITECTURE (EXACTLY 5 PLAYABLE EXAMPLES)
    ========================================================================== */
-/**
- * The 5 curated examples below form the complete playthrough dataset.
- * Structured cleanly for future extension without game-engine modification.
- */
 const PLAYABLE_CHALLENGES = [
   {
     id: "negroni",
@@ -88,35 +84,7 @@ const PLAYABLE_CHALLENGES = [
 ];
 
 /* ==========================================================================
-   2. DATA VALIDATION SUBSYSTEM
-   ========================================================================== */
-function validateChallengeDataset(dataset) {
-  if (!Array.now && !Array.isArray(dataset)) {
-    throw new Error("Challenge dataset must be an array.");
-  }
-  if (dataset.length !== 5) {
-    console.warn(`Dataset contract requirement: exactly 5 playable examples. Received: ${dataset.length}`);
-  }
-  const seenIds = new Set();
-  dataset.forEach((item, index) => {
-    if (!item.id || typeof item.id !== 'string') throw new Error(`Item ${index} missing valid id.`);
-    if (seenIds.has(item.id)) throw new Error(`Duplicate challenge id detected: ${item.id}`);
-    seenIds.add(item.id);
-    if (!item.name || typeof item.name !== 'string') throw new Error(`Item ${item.id} missing name.`);
-    if (!item.category || typeof item.category !== 'string') throw new Error(`Item ${item.id} missing category.`);
-    if (!item.spec || typeof item.spec !== 'string') throw new Error(`Item ${item.id} missing spec.`);
-  });
-  return true;
-}
-
-try {
-  validateChallengeDataset(PLAYABLE_CHALLENGES);
-} catch (err) {
-  console.error("Dataset validation error:", err);
-}
-
-/* ==========================================================================
-   3. SYNTHESIZED WEB AUDIO ENGINE (Zero External Assets)
+   2. SYNTHESIZED WEB AUDIO ENGINE
    ========================================================================== */
 class BartenderSoundEngine {
   constructor() {
@@ -140,7 +108,6 @@ class BartenderSoundEngine {
     if (!this.enabled) return;
     this.init();
     if (!this.ctx) return;
-
     try {
       const now = this.ctx.currentTime;
       const osc = this.ctx.createOscillator();
@@ -148,24 +115,19 @@ class BartenderSoundEngine {
       osc.type = 'triangle';
       osc.frequency.setValueAtTime(160, now);
       osc.frequency.exponentialRampToValueAtTime(45, now + 0.05);
-
       gain.gain.setValueAtTime(0.14, now);
       gain.gain.exponentialRampToValueAtTime(0.001, now + 0.05);
-
       osc.connect(gain);
       gain.connect(this.ctx.destination);
       osc.start(now);
       osc.stop(now + 0.05);
-    } catch (e) {
-      // Gracefully handle browser audio restrictions
-    }
+    } catch (e) {}
   }
 
   playCorrectChime() {
     if (!this.enabled) return;
     this.init();
     if (!this.ctx) return;
-
     try {
       const now = this.ctx.currentTime;
       [523.25, 659.25, 1046.50].forEach((freq, idx) => {
@@ -187,7 +149,6 @@ class BartenderSoundEngine {
     if (!this.enabled) return;
     this.init();
     if (!this.ctx) return;
-
     try {
       const now = this.ctx.currentTime;
       const osc = this.ctx.createOscillator();
@@ -195,10 +156,8 @@ class BartenderSoundEngine {
       osc.type = 'sawtooth';
       osc.frequency.setValueAtTime(90, now);
       osc.frequency.linearRampToValueAtTime(35, now + 0.1);
-
       gain.gain.setValueAtTime(0.18, now);
       gain.gain.exponentialRampToValueAtTime(0.001, now + 0.1);
-
       osc.connect(gain);
       gain.connect(this.ctx.destination);
       osc.start(now);
@@ -210,7 +169,6 @@ class BartenderSoundEngine {
     if (!this.enabled) return;
     this.init();
     if (!this.ctx) return;
-
     try {
       const now = this.ctx.currentTime;
       const chord = [392.00, 523.25, 659.25, 783.99, 1046.50];
@@ -233,7 +191,6 @@ class BartenderSoundEngine {
     if (!this.enabled) return;
     this.init();
     if (!this.ctx) return;
-
     try {
       const now = this.ctx.currentTime;
       for (let i = 0; i < 3; i++) {
@@ -255,11 +212,15 @@ class BartenderSoundEngine {
 const audio = new BartenderSoundEngine();
 
 /* ==========================================================================
-   4. GAME STATE MODEL & LOCAL STORAGE
+   3. GAME STATE MODEL & LOCALSTORAGE PERSISTENCE
    ========================================================================== */
 class BartenderGameState {
   constructor() {
-    this.currentMode = 'classic'; // 'classic', 'daily', 'rush', 'practice'
+    this.storageKey = 'bar_hangman_save_v2';
+    this.savedData = this.loadPersistentData();
+
+    // Transient runtime state
+    this.currentMode = 'classic';
     this.currentPuzzleIndex = 0;
     this.activePuzzle = null;
     this.guessedLetters = new Set();
@@ -272,24 +233,13 @@ class BartenderGameState {
     this.timerInterval = null;
     this.clueLevel = 1;
     this.isInputLocked = false;
-
-    // Shift summary records
     this.shiftHistory = [];
-
-    // Local storage persistence
-    this.storageKey = 'bar_hangman_save_v2';
-    this.savedData = this.loadPersistentData();
-    this.mistakeBank = this.savedData.mistakeBank || [];
   }
 
   loadPersistentData() {
-    try {
-      const raw = localStorage.getItem(this.storageKey);
-      if (raw) return JSON.parse(raw);
-    } catch (e) {
-      console.warn("Storage warning:", e);
-    }
-    return {
+    const defaultData = {
+      version: 1,
+      soundEnabled: true,
       highScore: 0,
       bestStreak: 0,
       totalPlayed: 0,
@@ -303,11 +253,34 @@ class BartenderGameState {
         SERVICE: 0
       }
     };
+
+    try {
+      const raw = localStorage.getItem(this.storageKey);
+      if (!raw) return defaultData;
+      const parsed = JSON.parse(raw);
+
+      // Validate & merge with defaults
+      return {
+        version: 1,
+        soundEnabled: typeof parsed.soundEnabled === 'boolean' ? parsed.soundEnabled : defaultData.soundEnabled,
+        highScore: typeof parsed.highScore === 'number' ? parsed.highScore : defaultData.highScore,
+        bestStreak: typeof parsed.bestStreak === 'number' ? parsed.bestStreak : defaultData.bestStreak,
+        totalPlayed: typeof parsed.totalPlayed === 'number' ? parsed.totalPlayed : defaultData.totalPlayed,
+        totalWon: typeof parsed.totalWon === 'number' ? parsed.totalWon : defaultData.totalWon,
+        unlockedCodexIds: Array.isArray(parsed.unlockedCodexIds) ? parsed.unlockedCodexIds : defaultData.unlockedCodexIds,
+        mistakeBank: Array.isArray(parsed.mistakeBank) ? parsed.mistakeBank : defaultData.mistakeBank,
+        categoryMastery: (parsed.categoryMastery && typeof parsed.categoryMastery === 'object') 
+          ? { ...defaultData.categoryMastery, ...parsed.categoryMastery } 
+          : defaultData.categoryMastery
+      };
+    } catch (e) {
+      console.warn("Storage recovery warning, resetting to safe state:", e);
+      return defaultData;
+    }
   }
 
   savePersistentData() {
     try {
-      this.savedData.mistakeBank = this.mistakeBank;
       localStorage.setItem(this.storageKey, JSON.stringify(this.savedData));
     } catch (e) {
       console.warn("Could not save to storage:", e);
@@ -332,6 +305,7 @@ class BartenderGameState {
     }
     if (this.score > this.savedData.highScore) {
       this.savedData.highScore = this.score;
+      this.savedData.bestStreak = Math.max(this.savedData.bestStreak, this.streak);
     }
 
     if (this.activePuzzle) {
@@ -342,7 +316,7 @@ class BartenderGameState {
       if (this.savedData.categoryMastery[cat] !== undefined) {
         this.savedData.categoryMastery[cat]++;
       }
-      this.mistakeBank = this.mistakeBank.filter(id => id !== this.activePuzzle.id);
+      this.savedData.mistakeBank = this.savedData.mistakeBank.filter(id => id !== this.activePuzzle.id);
 
       this.shiftHistory.push({
         id: this.activePuzzle.id,
@@ -361,8 +335,8 @@ class BartenderGameState {
     this.streak = 0;
 
     if (this.activePuzzle) {
-      if (!this.mistakeBank.includes(this.activePuzzle.id)) {
-        this.mistakeBank.push(this.activePuzzle.id);
+      if (!this.savedData.mistakeBank.includes(this.activePuzzle.id)) {
+        this.savedData.mistakeBank.push(this.activePuzzle.id);
       }
       this.shiftHistory.push({
         id: this.activePuzzle.id,
@@ -387,10 +361,24 @@ class BartenderGameState {
 const state = new BartenderGameState();
 
 /* ==========================================================================
-   5. UI CONTROLLER & VIEW BINDINGS
+   4. UI CONTROLLER & VIEW MANAGEMENT
    ========================================================================== */
 class BartenderUIController {
   constructor() {
+    // Screens
+    this.screenMenu = document.getElementById('screen-menu');
+    this.screenGame = document.getElementById('screen-game');
+
+    // Menu Elements
+    this.menuRankTitle = document.getElementById('menu-rank-title');
+    this.menuRecordSub = document.getElementById('menu-record-sub');
+    this.menuReviewCount = document.getElementById('menu-review-count');
+    this.menuBtnCodex = document.getElementById('menu-btn-codex');
+    this.menuBtnStats = document.getElementById('menu-btn-stats');
+
+    // Game Return
+    this.btnReturnMenu = document.getElementById('btn-return-menu');
+
     // HUD Elements
     this.hudRank = document.getElementById('hud-rank');
     this.hudProgress = document.getElementById('hud-progress');
@@ -451,7 +439,7 @@ class BartenderUIController {
     this.sumStreak = document.getElementById('sum-streak');
     this.summaryBreakdownList = document.getElementById('summary-breakdown-list');
     this.btnRestartShift = document.getElementById('btn-restart-shift');
-    this.btnOpenCodexFromSum = document.getElementById('btn-open-codex-from-sum');
+    this.btnReturnMenuFromSum = document.getElementById('btn-return-menu-from-sum');
 
     // Stats Modal
     this.statsModal = document.getElementById('stats-modal');
@@ -478,41 +466,74 @@ class BartenderUIController {
     this.soundIconOn = document.querySelector('.icon-sound-on');
     this.soundIconOff = document.querySelector('.icon-sound-off');
 
-    // Navigation Tabs
-    this.navTabs = document.querySelectorAll('.nav-tab');
-    this.reviewBadge = document.getElementById('review-count');
-
     // Toast
     this.toast = document.getElementById('toast-message');
     this.toastTimer = null;
 
     this.initKeyboard();
     this.bindEvents();
-    this.updateHUD();
+    this.syncSoundUI();
+    this.updateMenuHub();
+  }
+
+  showScreen(screenName) {
+    if (screenName === 'menu') {
+      this.screenMenu.classList.remove('hidden');
+      this.screenGame.classList.add('hidden');
+      this.updateMenuHub();
+    } else {
+      this.screenMenu.classList.add('hidden');
+      this.screenGame.classList.remove('hidden');
+    }
+  }
+
+  updateMenuHub() {
+    this.menuRankTitle.textContent = state.getRankTitle();
+    this.menuRecordSub.textContent = `Best Shift Score: ${state.savedData.highScore}`;
+    this.menuReviewCount.textContent = state.savedData.mistakeBank.length;
+  }
+
+  syncSoundUI() {
+    audio.enabled = state.savedData.soundEnabled;
+    if (audio.enabled) {
+      this.soundIconOn.classList.remove('hidden');
+      this.soundIconOff.classList.add('hidden');
+    } else {
+      this.soundIconOn.classList.add('hidden');
+      this.soundIconOff.classList.remove('hidden');
+    }
   }
 
   bindEvents() {
-    // Mode navigation
-    this.navTabs.forEach(tab => {
-      tab.addEventListener('click', () => {
-        const mode = tab.dataset.mode;
-        this.navTabs.forEach(t => t.classList.remove('active'));
-        tab.classList.add('active');
+    // Menu Mode Buttons
+    document.querySelectorAll('.menu-mode-list .menu-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const mode = btn.dataset.mode;
         gameEngine.switchMode(mode);
+        this.showScreen('game');
       });
+    });
+
+    // Menu secondary buttons
+    this.menuBtnCodex.addEventListener('click', () => this.openCodexModal());
+    this.menuBtnStats.addEventListener('click', () => this.openStatsModal());
+
+    // Return to menu
+    this.btnReturnMenu.addEventListener('click', () => {
+      gameEngine.stopTimer();
+      this.showScreen('menu');
     });
 
     // Sound toggle
     this.btnSound.addEventListener('click', () => {
       audio.enabled = !audio.enabled;
+      state.savedData.soundEnabled = audio.enabled;
+      state.savePersistentData();
+      this.syncSoundUI();
       if (audio.enabled) {
-        this.soundIconOn.classList.remove('hidden');
-        this.soundIconOff.classList.add('hidden');
         this.showToast("Sound On");
         audio.playLetterTap();
       } else {
-        this.soundIconOn.classList.add('hidden');
-        this.soundIconOff.classList.remove('hidden');
         this.showToast("Sound Muted");
       }
     });
@@ -543,9 +564,9 @@ class BartenderUIController {
       gameEngine.restartFullShift();
     });
 
-    this.btnOpenCodexFromSum.addEventListener('click', () => {
+    this.btnReturnMenuFromSum.addEventListener('click', () => {
       this.summaryModal.classList.add('hidden');
-      this.openCodexModal();
+      this.showScreen('menu');
     });
 
     // Bold Guess Panel
@@ -585,6 +606,7 @@ class BartenderUIController {
 
     // Physical Keyboard Input
     window.addEventListener('keydown', (e) => {
+      if (this.screenGame.classList.contains('hidden')) return;
       if (e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT') return;
       if (e.key === 'Escape') {
         this.statsModal.classList.add('hidden');
@@ -685,7 +707,6 @@ class BartenderUIController {
     this.hudProgress.textContent = `${state.currentPuzzleIndex + 1} / ${gameEngine.activePool.length}`;
     this.hudStreak.textContent = state.streak;
     this.hudScore.textContent = state.score;
-    this.reviewBadge.textContent = state.mistakeBank.length;
 
     if (state.currentMode === 'rush') {
       this.hudTimerContainer.classList.remove('hidden');
@@ -707,14 +728,12 @@ class BartenderUIController {
     });
     this.strikePips.setAttribute('aria-label', `Mistake strikes: ${mistakes} of ${maxMistakes}`);
 
-    // Dynamic liquid drain: 75px full height
     const percentLeft = Math.max(0, 1 - (mistakes / maxMistakes));
     const liquidY = 20 + (75 * (1 - percentLeft));
     const liquidH = 75 * percentLeft;
     this.liquidFill.setAttribute('y', liquidY);
     this.liquidFill.setAttribute('height', liquidH);
 
-    // Progressive glass stress cracks
     this.cracks[0].classList.toggle('hidden', mistakes < 2);
     this.cracks[1].classList.toggle('hidden', mistakes < 4);
     this.cracks[2].classList.toggle('hidden', mistakes < 6);
@@ -864,7 +883,7 @@ class BartenderUIController {
 }
 
 /* ==========================================================================
-   6. CORE GAMEPLAY ENGINE & ORCHESTRATOR
+   5. CORE GAMEPLAY ENGINE
    ========================================================================== */
 class BartenderGameEngine {
   constructor() {
@@ -874,7 +893,6 @@ class BartenderGameEngine {
 
   init() {
     this.ui = new BartenderUIController();
-    this.switchMode('classic');
   }
 
   switchMode(mode) {
@@ -883,10 +901,8 @@ class BartenderGameEngine {
     state.resetShift();
 
     if (mode === 'classic') {
-      // Direct fixed progression of the 5 canonical examples
       this.activePool = [...PLAYABLE_CHALLENGES];
     } else if (mode === 'daily') {
-      // Deterministic single daily feature from the 5 examples
       const dayOfYear = Math.floor((Date.now() - new Date(new Date().getFullYear(), 0, 0)) / 86400000);
       const dailyIndex = dayOfYear % PLAYABLE_CHALLENGES.length;
       this.activePool = [PLAYABLE_CHALLENGES[dailyIndex]];
@@ -897,11 +913,11 @@ class BartenderGameEngine {
       this.startTimer();
       this.ui.showToast("Service Rush: 60-Second Shift!");
     } else if (mode === 'practice') {
-      if (state.mistakeBank.length === 0) {
+      if (state.savedData.mistakeBank.length === 0) {
         this.ui.showToast("No missed tickets on file. Practicing standard specs.");
         this.activePool = [...PLAYABLE_CHALLENGES];
       } else {
-        this.activePool = PLAYABLE_CHALLENGES.filter(item => state.mistakeBank.includes(item.id));
+        this.activePool = PLAYABLE_CHALLENGES.filter(item => state.savedData.mistakeBank.includes(item.id));
         this.ui.showToast(`Reviewing ${this.activePool.length} missed drink tickets`);
       }
     }
@@ -948,7 +964,6 @@ class BartenderGameEngine {
   advanceAfterModal() {
     const nextIdx = state.currentPuzzleIndex + 1;
     if (nextIdx >= this.activePool.length) {
-      // Completed the 5-example shift!
       this.stopTimer();
       this.ui.showShiftSummary();
     } else {
@@ -1057,7 +1072,6 @@ class BartenderGameEngine {
 
     if (normalizedGuess === normalizedTarget) {
       audio.playSolveFanfare();
-      // Reveal all letters
       for (let i = 0; i < state.activePuzzle.name.length; i++) {
         const c = state.activePuzzle.name[i];
         if (/[A-Z]/.test(c)) state.guessedLetters.add(c);
@@ -1096,7 +1110,6 @@ class BartenderGameEngine {
       state.recordSolve(state.mistakes === 0, roundPoints);
     } else {
       state.recordLoss();
-      // Reveal all letters so user learns
       for (let i = 0; i < state.activePuzzle.name.length; i++) {
         const c = state.activePuzzle.name[i];
         if (/[A-Z]/.test(c)) state.guessedLetters.add(c);
@@ -1105,7 +1118,6 @@ class BartenderGameEngine {
     }
 
     this.ui.updateHUD();
-
     const isLastTicket = (state.currentPuzzleIndex + 1) >= this.activePool.length;
 
     setTimeout(() => {
