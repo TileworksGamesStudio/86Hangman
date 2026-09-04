@@ -1,0 +1,324 @@
+<!-- index.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="description" content="Bar Hangman - A professional bartender knowledge game and cocktail mystery puzzle.">
+  <title>Bar Hangman — The Bartender's Knowledge Game</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;900&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="app-wrapper">
+    <!-- Header / Top Bar -->
+    <header class="bar-header" role="banner">
+      <div class="header-content">
+        <div class="brand">
+          <div class="brand-crest" aria-hidden="true">
+            <svg viewBox="0 0 32 32" class="crest-svg">
+              <path d="M7 6 h18 v2 l-7 9 v7 h4 v2 h-12 v-2 h4 v-7 l-7 -9 z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
+              <circle cx="16" cy="12" r="1.5" fill="currentColor"/>
+            </svg>
+          </div>
+          <div>
+            <h1 class="brand-title">BAR HANGMAN</h1>
+            <p class="brand-subtitle">Craft Cocktail &amp; Beverage Bible</p>
+          </div>
+        </div>
+        <div class="header-actions">
+          <button id="btn-sound" class="icon-btn" aria-label="Toggle Sound" title="Sound Effects">
+            <svg class="icon" viewBox="0 0 24 24" id="sound-icon-on">
+              <path d="M11 5L6 9H2v6h4l5 4V5zM15.54 8.46a5 5 0 0 1 0 7.07M19.07 4.93a10 10 0 0 1 0 14.14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            <svg class="icon hidden" viewBox="0 0 24 24" id="sound-icon-off">
+              <line x1="1" y1="1" x2="23" y2="23" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+              <path d="M11 5L6 9H2v6h4l5 4V5zM23 9l-6 6M17 9l6 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+          </button>
+          <button id="btn-stats" class="icon-btn" aria-label="View Bartender Shift Career Stats" title="Bartender Career Stats">
+            <svg class="icon" viewBox="0 0 24 24">
+              <path d="M18 20V10M12 20V4M6 20v-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </button>
+          <button id="btn-codex" class="icon-btn" aria-label="Open Cocktail Codex" title="The Bartender's Codex">
+            <svg class="icon" viewBox="0 0 24 24">
+              <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20M4 19.5A2.5 2.5 0 0 0 6.5 22H20V2H6.5A2.5 2.5 0 0 0 4 4.5v15z" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- Navigation Tabs -->
+    <nav class="mode-navigation" role="navigation" aria-label="Game Modes">
+      <button class="nav-tab active" data-mode="classic">Classic Shift</button>
+      <button class="nav-tab" data-mode="daily">Daily Spec</button>
+      <button class="nav-tab" data-mode="rush">Service Rush</button>
+      <button class="nav-tab" data-mode="practice">Mistake Review <span class="badge" id="review-count">0</span></button>
+    </nav>
+
+    <!-- Main Game Workspace -->
+    <main id="game-container" class="game-main" role="main">
+      <!-- Status Dashboard -->
+      <section class="game-hud" aria-label="Current Puzzle Status">
+        <div class="hud-item rank-item">
+          <span class="hud-label">Station</span>
+          <span class="hud-value" id="hud-rank">Barback</span>
+        </div>
+        <div class="hud-item streak-item">
+          <span class="hud-label">Shift Streak</span>
+          <span class="hud-value" id="hud-streak">0</span>
+        </div>
+        <div class="hud-item score-item">
+          <span class="hud-label">Score</span>
+          <span class="hud-value" id="hud-score">0</span>
+        </div>
+        <div class="hud-item timer-item hidden" id="hud-timer-container">
+          <span class="hud-label">Ticket Timer</span>
+          <span class="hud-value timer-text" id="hud-timer">60s</span>
+        </div>
+      </section>
+
+      <!-- Glass / Pour Mistake Visualizer -->
+      <section class="cocktail-station" aria-label="Cocktail Station Quality">
+        <div class="station-glass-wrapper">
+          <svg class="station-glass-svg" viewBox="0 0 120 150" aria-hidden="true">
+            <defs>
+              <linearGradient id="liquid-grad" x1="0%" y1="0%" x2="0%" y2="100%">
+                <stop offset="0%" stop-color="#D5A447" />
+                <stop offset="100%" stop-color="#B95727" />
+              </linearGradient>
+              <linearGradient id="glass-reflect" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" stop-color="#ffffff" stop-opacity="0.3"/>
+                <stop offset="50%" stop-color="#ffffff" stop-opacity="0.05"/>
+                <stop offset="100%" stop-color="#ffffff" stop-opacity="0.2"/>
+              </linearGradient>
+              <clipPath id="glass-interior-clip">
+                <path d="M 22 18 L 98 18 L 74 95 L 46 95 Z"/>
+              </clipPath>
+            </defs>
+
+            <!-- Coupe Contour Glass Outline -->
+            <path d="M 20 16 L 100 16 L 76 96 L 63 96 L 63 134 L 84 134 L 84 139 L 36 139 L 36 134 L 57 134 L 57 96 L 44 96 Z" 
+                  fill="none" stroke="rgba(213, 164, 71, 0.4)" stroke-width="2.5" stroke-linejoin="round"/>
+            <path d="M 24 20 L 96 20 L 74 92 L 46 92 Z" fill="url(#glass-reflect)"/>
+
+            <!-- Liquid Level (Controlled by mistake percentage) -->
+            <g clip-path="url(#glass-interior-clip)">
+              <rect id="liquid-fill" x="20" y="20" width="80" height="80" fill="url(#liquid-grad)"/>
+              <!-- Mistake Spill Ice/Cracks (Appears as mistakes increase) -->
+              <line id="crack-1" class="glass-fault hidden" x1="28" y1="30" x2="48" y2="60" stroke="#9B3627" stroke-width="2"/>
+              <line id="crack-2" class="glass-fault hidden" x1="90" y1="28" x2="72" y2="68" stroke="#9B3627" stroke-width="2"/>
+              <line id="crack-3" class="glass-fault hidden" x1="42" y1="75" x2="68" y2="82" stroke="#9B3627" stroke-width="2.5"/>
+            </g>
+
+            <!-- Garnish Silhouette -->
+            <path id="garnish-lemon" class="garnish-art" d="M 92 12 C 92 6 98 2 104 2 C 112 2 114 8 114 14 C 114 20 108 24 100 22 Z" fill="#D5A447" opacity="0.85"/>
+          </svg>
+        </div>
+
+        <div class="mistake-readout">
+          <div class="mistake-title-row">
+            <span class="station-ticket-tag" id="puzzle-category">COCKTAIL</span>
+            <span class="mistake-counter">Strikes: <strong id="strikes-count">0</strong> / 6</span>
+          </div>
+          <!-- Strike Pips -->
+          <div class="strike-pips" id="strike-pips" role="status" aria-label="Mistake strikes">
+            <span class="pip"></span><span class="pip"></span><span class="pip"></span>
+            <span class="pip"></span><span class="pip"></span><span class="pip"></span>
+          </div>
+        </div>
+      </section>
+
+      <!-- Clue Card & Category Context -->
+      <section class="clue-container" aria-live="polite">
+        <div class="clue-header">
+          <span class="clue-badge" id="clue-level-badge">Clue Level 1</span>
+          <span class="clue-family-tag" id="clue-family">Classic Sour Family</span>
+        </div>
+        <p class="clue-text" id="clue-text">Loading tasting note and historical prompt...</p>
+        
+        <!-- Interactive Clue Unlocks -->
+        <div class="clue-actions">
+          <button id="btn-reveal-clue" class="btn-secondary btn-sm" title="Unlock deeper professional note (-20pts)">
+            <svg class="btn-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 16v-4M12 8h.01" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+            <span>Deeper Clue (<span id="hint-cost">20</span> pts)</span>
+          </button>
+          <button id="btn-vowel-hint" class="btn-secondary btn-sm" title="Consult bar notes for vowel assistance">
+            <svg class="btn-icon" viewBox="0 0 24 24"><path d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 1 1 7.072 0l-.548.547A3.374 3.374 0 0 0 14 18.469V19a2 2 0 1 1-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" fill="none" stroke="currentColor" stroke-width="2"/></svg>
+            <span>Reveal a Letter (-40pts)</span>
+          </button>
+        </div>
+      </section>
+
+      <!-- Letter Word Puzzle Slots -->
+      <section class="word-stage" aria-label="Puzzle Word Slots">
+        <div class="slots-scroller">
+          <div id="word-slots" class="word-slots-container" role="region" aria-live="assertive">
+            <!-- Dynamically populated letters / spaces -->
+          </div>
+        </div>
+      </section>
+
+      <!-- On-screen Virtual Bartender Keyboard -->
+      <section class="keyboard-stage" aria-label="Letter Input Keyboard">
+        <div id="virtual-keyboard" class="virtual-keyboard">
+          <!-- Rows Q-P, A-L, Z-M generated via script with full accessibility -->
+        </div>
+      </section>
+
+      <!-- Bold Guess Bar (High Risk / High Reward) -->
+      <section class="bold-guess-bar">
+        <button id="btn-solve-open" class="btn-text-action" aria-expanded="false">
+          Quick-Call Spec (Solve Entire Phrase) &rarr;
+        </button>
+        <div id="bold-guess-panel" class="bold-guess-panel hidden">
+          <label for="bold-guess-input" class="sr-only">Type your full cocktail or term guess</label>
+          <input type="text" id="bold-guess-input" placeholder="Type complete name..." autocomplete="off" autocorrect="off" autocapitalize="characters" spellcheck="false">
+          <button id="btn-submit-bold" class="btn-primary btn-sm">Call It</button>
+          <button id="btn-cancel-bold" class="btn-secondary btn-sm">Back</button>
+        </div>
+      </section>
+    </main>
+
+    <!-- Post-Puzzle Educational Knowledge Modal -->
+    <div id="knowledge-modal" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="modal-drink-title">
+      <div class="modal-card">
+        <div class="modal-badge-banner" id="modal-result-status">SPEC COMPLETED</div>
+        
+        <header class="modal-header">
+          <h2 class="modal-drink-name" id="modal-drink-title">NEGRONI</h2>
+          <div class="modal-meta-row">
+            <span class="modal-family-pill" id="modal-meta-family">Aperitivo / Equal Parts</span>
+            <span class="modal-glass-pill" id="modal-meta-glass">Double Rocks Glass</span>
+          </div>
+        </header>
+
+        <div class="modal-body-scroll">
+          <!-- Recipe Spec Box -->
+          <div class="spec-formula-card">
+            <h3 class="spec-label">Classic Reference Spec</h3>
+            <p class="spec-formula" id="modal-spec-formula">1 oz London Dry Gin &bull; 1 oz Campari &bull; 1 oz Sweet Vermouth</p>
+          </div>
+
+          <!-- Why It Matters / Professional Context -->
+          <div class="knowledge-block">
+            <h3 class="block-label">Professional Context</h3>
+            <p class="block-content" id="modal-why-matters">The definitive bittersweet Italian classic balance...</p>
+          </div>
+
+          <!-- Bartender's Secret / Variation / Technique Note -->
+          <div class="knowledge-block" id="modal-block-tip">
+            <h3 class="block-label">Bar Station Tip &amp; Technique</h3>
+            <p class="block-content" id="modal-bartender-tip">Expressed orange peel over the rim releases heavy essential citrus oils, bridging herbal notes without acidic juice.</p>
+          </div>
+
+          <!-- Historical Note or Myth/Fact -->
+          <div class="knowledge-block history-block">
+            <h3 class="block-label">Historical Fact &amp; Lore</h3>
+            <p class="block-content" id="modal-history-note">Invented circa 1919 at Caffè Casoni in Florence when Count Camillo Negroni requested gin instead of soda water in his Americano.</p>
+          </div>
+
+          <!-- Score Breakdown -->
+          <div class="solve-metrics">
+            <div class="metric"><span class="m-val" id="metric-round-score">+120</span><span class="m-lbl">Points Earned</span></div>
+            <div class="metric"><span class="m-val" id="metric-accuracy">100%</span><span class="m-lbl">Accuracy</span></div>
+            <div class="metric"><span class="m-val" id="metric-shift-time">14s</span><span class="m-lbl">Ticket Time</span></div>
+          </div>
+        </div>
+
+        <footer class="modal-footer">
+          <button id="btn-next-puzzle" class="btn-primary btn-block">Next Ticket &rarr;</button>
+        </footer>
+      </div>
+    </div>
+
+    <!-- Bartender Career Stats Modal -->
+    <div id="stats-modal" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="stats-modal-title">
+      <div class="modal-card">
+        <header class="modal-header">
+          <h2 class="modal-drink-name" id="stats-modal-title">Shift Performance</h2>
+          <p class="modal-sub">Career Records &amp; Station Log</p>
+        </header>
+
+        <div class="modal-body-scroll">
+          <div class="stats-grid">
+            <div class="stat-box">
+              <span class="stat-number" id="st-total-played">0</span>
+              <span class="stat-desc">Tickets Served</span>
+            </div>
+            <div class="stat-box">
+              <span class="stat-number" id="st-total-won">0</span>
+              <span class="stat-desc">Clean Solves</span>
+            </div>
+            <div class="stat-box">
+              <span class="stat-number" id="st-high-streak">0</span>
+              <span class="stat-desc">Best Shift Streak</span>
+            </div>
+            <div class="stat-box">
+              <span class="stat-number" id="st-high-score">0</span>
+              <span class="stat-desc">Career High Score</span>
+            </div>
+          </div>
+
+          <div class="tier-progression">
+            <h3 class="spec-label">Professional Station Rank</h3>
+            <div class="tier-bar-bg">
+              <div class="tier-bar-fill" id="tier-bar-progress"></div>
+            </div>
+            <p class="tier-status-text" id="tier-next-prompt">150 points to Apprentice Bartender</p>
+          </div>
+
+          <div class="category-mastery-list" id="category-mastery-list">
+            <!-- Populated via JS -->
+          </div>
+        </div>
+
+        <footer class="modal-footer">
+          <button id="btn-close-stats" class="btn-secondary btn-block">Return to Station</button>
+        </footer>
+      </div>
+    </div>
+
+    <!-- Codex Reference Library Modal -->
+    <div id="codex-modal" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="codex-modal-title">
+      <div class="modal-card modal-large">
+        <header class="modal-header">
+          <h2 class="modal-drink-name" id="codex-modal-title">The Bartender's Codex</h2>
+          <p class="modal-sub">Unlocked Recipes, Tools, &amp; Beverage Science</p>
+        </header>
+
+        <div class="codex-filter-bar">
+          <input type="text" id="codex-search" class="codex-search-input" placeholder="Search drinks, spirits, glass..." autocomplete="off">
+          <select id="codex-filter-category" class="codex-select">
+            <option value="ALL">All Categories</option>
+            <option value="COCKTAIL">Cocktails</option>
+            <option value="SPIRIT">Spirits</option>
+            <option value="INGREDIENT">Modifiers &amp; Syrups</option>
+            <option value="TOOL">Tools &amp; Bar Station</option>
+            <option value="GLASSWARE">Glassware &amp; Ice</option>
+            <option value="TECHNIQUE">Technique &amp; Science</option>
+            <option value="SERVICE">Service &amp; Hospitality</option>
+          </select>
+        </div>
+
+        <div class="modal-body-scroll" id="codex-list-container">
+          <!-- Populated dynamically with discoverable terms -->
+        </div>
+
+        <footer class="modal-footer">
+          <button id="btn-close-codex" class="btn-secondary btn-block">Close Codex</button>
+        </footer>
+      </div>
+    </div>
+
+    <!-- Floating Feedback Toast / Flash Indicator -->
+    <div id="toast-message" class="toast-popup hidden" role="alert" aria-live="assertive"></div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
