@@ -1,14 +1,14 @@
 /* script.js */
 /**
- * BAR HANGMAN — Master Production Engine
- * Complete 5-Ticket Bartender Knowledge System with System Continuity,
- * Mode-Aware Lifecycles, Contained Screen Scrolling, & State Persistence.
+ * BAR HANGMAN — High-End Neubrutalism Production Engine
+ * Complete Bartender Knowledge System with System Continuity,
+ * Mode-Aware Lifecycles, and 5 Foundational Challenges.
  */
 
 'use strict';
 
 /* ==========================================================================
-   1. CONTENT DATA ARCHITECTURE (CANONICAL 5 PLAYABLE TICKETS)
+   1. CONTENT DATA ARCHITECTURE (FOUNDATIONAL 5 PLAYABLE TICKETS)
    ========================================================================== */
 const PLAYABLE_CHALLENGES = [
   /* ==========================================================================
@@ -982,7 +982,6 @@ class BartenderGameState {
     this.storageKey = 'bar_hangman_save_v2';
     this.savedData = this.loadPersistentData();
 
-    // Transient runtime state
     this.currentMode = 'classic';
     this.currentPuzzleIndex = 0;
     this.activePuzzle = null;
@@ -1040,7 +1039,6 @@ class BartenderGameState {
           : defaultData.categoryMastery
       };
     } catch (e) {
-      console.warn("Storage recovery: safely reverting to fresh schema.", e);
       return defaultData;
     }
   }
@@ -1048,9 +1046,7 @@ class BartenderGameState {
   savePersistentData() {
     try {
       localStorage.setItem(this.storageKey, JSON.stringify(this.savedData));
-    } catch (e) {
-      console.warn("Local storage write error:", e);
-    }
+    } catch (e) {}
   }
 
   resetAllRecords() {
@@ -1119,7 +1115,6 @@ class BartenderGameState {
       if (this.savedData.categoryMastery[cat] !== undefined) {
         this.savedData.categoryMastery[cat]++;
       }
-      // Remove from practice review bank if clean solve
       this.savedData.mistakeBank = this.savedData.mistakeBank.filter(id => id !== this.activePuzzle.id);
 
       this.shiftHistory.push({
@@ -1169,11 +1164,9 @@ const state = new BartenderGameState();
    ========================================================================== */
 class BartenderUIController {
   constructor() {
-    // Top Screens
     this.screenMenu = document.getElementById('screen-menu');
     this.screenGame = document.getElementById('screen-game');
 
-    // Menu Hub
     this.menuRankTitle = document.getElementById('menu-rank-title');
     this.menuRecordSub = document.getElementById('menu-record-sub');
     this.menuReviewCount = document.getElementById('menu-review-count');
@@ -1181,7 +1174,6 @@ class BartenderUIController {
     this.menuBtnCodex = document.getElementById('menu-btn-codex');
     this.menuBtnStats = document.getElementById('menu-btn-stats');
 
-    // Game Header
     this.btnReturnMenu = document.getElementById('btn-return-menu');
     this.btnSound = document.getElementById('btn-sound');
     this.soundIconOn = document.querySelector('.icon-sound-on');
@@ -1189,7 +1181,6 @@ class BartenderUIController {
     this.btnStats = document.getElementById('btn-stats');
     this.btnCodex = document.getElementById('btn-codex');
 
-    // In-game HUD
     this.hudRank = document.getElementById('hud-rank');
     this.hudProgress = document.getElementById('hud-progress');
     this.hudStreak = document.getElementById('hud-streak');
@@ -1197,7 +1188,6 @@ class BartenderUIController {
     this.hudTimerContainer = document.getElementById('hud-timer-container');
     this.hudTimer = document.getElementById('hud-timer');
 
-    // Cocktail Station Graphic & Strikes
     this.strikesCount = document.getElementById('strikes-count');
     this.strikePips = document.getElementById('strike-pips');
     this.liquidFill = document.getElementById('liquid-fill');
@@ -1208,25 +1198,21 @@ class BartenderUIController {
     ];
     this.puzzleCategory = document.getElementById('puzzle-category');
 
-    // Clue Card & Interactive Actions
     this.clueLevelBadge = document.getElementById('clue-level-badge');
     this.clueFamily = document.getElementById('clue-family');
     this.clueText = document.getElementById('clue-text');
     this.btnRevealClue = document.getElementById('btn-reveal-clue');
     this.btnVowelHint = document.getElementById('btn-vowel-hint');
 
-    // Letter Slots & Keyboard
     this.wordSlotsContainer = document.getElementById('word-slots');
     this.keyboardContainer = document.getElementById('virtual-keyboard');
 
-    // Bold Guess
     this.btnSolveOpen = document.getElementById('btn-solve-open');
     this.boldGuessPanel = document.getElementById('bold-guess-panel');
     this.boldGuessInput = document.getElementById('bold-guess-input');
     this.btnSubmitBold = document.getElementById('btn-submit-bold');
     this.btnCancelBold = document.getElementById('btn-cancel-bold');
 
-    // Ticket Knowledge Modal
     this.knowledgeModal = document.getElementById('knowledge-modal');
     this.modalStatus = document.getElementById('modal-result-status');
     this.modalTitle = document.getElementById('modal-drink-title');
@@ -1241,7 +1227,6 @@ class BartenderUIController {
     this.metricShiftTime = document.getElementById('metric-shift-time');
     this.btnNextPuzzle = document.getElementById('btn-next-puzzle');
 
-    // Shift Summary Modal
     this.summaryModal = document.getElementById('shift-summary-modal');
     this.summaryBanner = document.getElementById('summary-banner');
     this.summaryTitle = document.getElementById('summary-title');
@@ -1254,7 +1239,6 @@ class BartenderUIController {
     this.btnRestartShift = document.getElementById('btn-restart-shift');
     this.btnReturnMenuFromSum = document.getElementById('btn-return-menu-from-sum');
 
-    // Career Stats Modal
     this.statsModal = document.getElementById('stats-modal');
     this.btnCloseStats = document.getElementById('btn-close-stats');
     this.btnCloseStatsTop = document.getElementById('btn-close-stats-top');
@@ -1269,7 +1253,6 @@ class BartenderUIController {
     this.catMasteryList = document.getElementById('category-mastery-list');
     this.btnResetStats = document.getElementById('btn-reset-stats');
 
-    // Codex Modal
     this.codexModal = document.getElementById('codex-modal');
     this.btnCloseCodex = document.getElementById('btn-close-codex');
     this.btnCloseCodexTop = document.getElementById('btn-close-codex-top');
@@ -1277,7 +1260,6 @@ class BartenderUIController {
     this.codexFilterCat = document.getElementById('codex-filter-category');
     this.codexListContainer = document.getElementById('codex-list-container');
 
-    // Toast
     this.toast = document.getElementById('toast-message');
     this.toastTimer = null;
 
@@ -1322,7 +1304,6 @@ class BartenderUIController {
   }
 
   bindEvents() {
-    // Mode selections
     document.querySelectorAll('.menu-mode-list .menu-btn').forEach(btn => {
       btn.addEventListener('click', () => {
         const mode = btn.dataset.mode;
@@ -1331,39 +1312,28 @@ class BartenderUIController {
       });
     });
 
-    // Menu secondary buttons
     this.menuBtnCodex.addEventListener('click', () => this.openCodexModal());
     this.menuBtnStats.addEventListener('click', () => this.openStatsModal());
 
-    // In-game header return
     this.btnReturnMenu.addEventListener('click', () => {
       gameEngine.stopTimer();
       this.showScreen('menu');
     });
 
-    // Sound toggle
     this.btnSound.addEventListener('click', () => {
       audio.enabled = !audio.enabled;
       state.savedData.soundEnabled = audio.enabled;
       state.savePersistentData();
       this.syncSoundUI();
-      if (audio.enabled) {
-        this.showToast("Sound Effects Active");
-        audio.playLetterTap();
-      } else {
-        this.showToast("Sound Muted");
-      }
+      this.showToast(audio.enabled ? "Sound Effects Active" : "Sound Muted");
     });
 
-    // Career Stats buttons
     this.btnStats.addEventListener('click', () => this.openStatsModal());
     this.btnCloseStats.addEventListener('click', () => this.statsModal.classList.add('hidden'));
     this.btnCloseStatsTop.addEventListener('click', () => this.statsModal.classList.add('hidden'));
 
-    // Reset records button in stats
     this.btnResetStats.addEventListener('click', () => {
-      const confirmed = window.confirm("Reset all Bartender Career Records and unlocked Codex specs?");
-      if (confirmed) {
+      if (window.confirm("Reset all Bartender Career Records and unlocked Codex specs?")) {
         state.resetAllRecords();
         this.openStatsModal();
         this.updateMenuHub();
@@ -1371,24 +1341,20 @@ class BartenderUIController {
       }
     });
 
-    // Codex buttons & filters
     this.btnCodex.addEventListener('click', () => this.openCodexModal());
     this.btnCloseCodex.addEventListener('click', () => this.codexModal.classList.add('hidden'));
     this.btnCloseCodexTop.addEventListener('click', () => this.codexModal.classList.add('hidden'));
     this.codexSearch.addEventListener('input', () => this.renderCodexList());
     this.codexFilterCat.addEventListener('change', () => this.renderCodexList());
 
-    // Gameplay Assists
     this.btnRevealClue.addEventListener('click', () => gameEngine.revealDeeperClue());
     this.btnVowelHint.addEventListener('click', () => gameEngine.useLetterHint());
 
-    // Next puzzle or Shift Complete button
     this.btnNextPuzzle.addEventListener('click', () => {
       this.knowledgeModal.classList.add('hidden');
       gameEngine.advanceAfterModal();
     });
 
-    // Shift summary buttons
     this.btnRestartShift.addEventListener('click', () => {
       this.summaryModal.classList.add('hidden');
       gameEngine.restartFullShift();
@@ -1399,7 +1365,6 @@ class BartenderUIController {
       this.showScreen('menu');
     });
 
-    // Bold Guess Panel
     this.btnSolveOpen.addEventListener('click', () => {
       const isHidden = this.boldGuessPanel.classList.contains('hidden');
       if (isHidden) {
@@ -1438,7 +1403,6 @@ class BartenderUIController {
       }
     });
 
-    // Physical Keyboard Input Listener
     window.addEventListener('keydown', (e) => {
       if (this.screenGame.classList.contains('hidden')) return;
       if (e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT') return;
@@ -1457,7 +1421,6 @@ class BartenderUIController {
       }
     });
 
-    // Close modals on backdrop click
     [this.statsModal, this.codexModal].forEach(modal => {
       modal.addEventListener('click', (e) => {
         if (e.target === modal) {
@@ -1557,7 +1520,6 @@ class BartenderUIController {
       this.hudTimerContainer.classList.add('hidden');
     }
 
-    // Update assist button affordability indicators
     if (state.clueLevel >= 3) {
       this.btnRevealClue.setAttribute('disabled', 'true');
       this.btnRevealClue.title = "All tasting clues revealed";
@@ -1722,7 +1684,7 @@ class BartenderUIController {
     });
 
     if (list.length === 0) {
-      this.codexListContainer.innerHTML = `<p style="text-align:center; color:var(--color-parchment-dim); padding:20px; font-size:0.8rem;">No recipe entries match the active filter.</p>`;
+      this.codexListContainer.innerHTML = `<p style="text-align:center; color:var(--color-parchment-dim); padding:20px; font-size:0.8rem; font-weight:700;">No recipe entries match the active filter.</p>`;
       return;
     }
 
@@ -1941,7 +1903,6 @@ class BartenderGameEngine {
       return;
     }
 
-    // Pick vowel if available, else random unrevealed consonant
     const vowels = unrevealedLetters.filter(l => ['A', 'E', 'I', 'O', 'U'].includes(l));
     const pick = vowels.length > 0 
       ? vowels[Math.floor(Math.random() * vowels.length)]
@@ -1986,7 +1947,6 @@ class BartenderGameEngine {
       state.recordSolve(state.mistakes === 0, earnedPoints);
     } else {
       state.recordLoss();
-      // Reveal the missed word in red
       state.activePuzzle.userGuesses = new Set(this.userPicksThisTicket);
       for (let i = 0; i < state.activePuzzle.name.length; i++) {
         const c = state.activePuzzle.name[i];
