@@ -2,289 +2,306 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <meta name="description" content="The Coupe — Daily Cocktail Hangman.">
-  <meta name="theme-color" content="#0d0402">
-  <title>THE COUPE</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Hangman — The Reserve Lounge</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;900&family=Playfair+Display:ital,wght@0,600;0,700;0,900;1,400&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="./style.css">
 </head>
 <body>
 
-  <div class="ambient-bg" aria-hidden="true">
-    <div class="ambient-glow glow-top"></div>
-    <div class="ambient-glow glow-bottom"></div>
-    <div id="garnish-layer" class="garnish-layer"></div>
+  <!-- Ambient Cocktail Lounge Lighting & Vignette -->
+  <div class="lounge-ambient-layer" aria-hidden="true">
+    <div class="caustic caustic-1"></div>
+    <div class="caustic caustic-2"></div>
+    <div class="ambient-vignette"></div>
+    <div class="lounge-grain"></div>
   </div>
 
-  <svg xmlns="http://www.w3.org/2000/svg" style="display: none;" aria-hidden="true">
+  <!-- Animated Floating Cocktail Garnish Stage -->
+  <div id="garnish-canvas-container" class="garnish-stage" aria-hidden="true"></div>
+
+  <!-- Hidden SVG Symbol Library for the 12 Handcrafted Cocktail Garnishes -->
+  <svg class="sr-only" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
     <defs>
-      <g id="garnish-twist">
-        <path d="M 6 34 C 10 24, 20 18, 30 20 C 42 22, 40 38, 28 38 C 16 38, 14 16, 26 8 C 34 2, 44 4, 48 10" fill="none" stroke="var(--gold-sheen-2)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
-        <path d="M 8 32 C 12 23, 22 18, 30 20" fill="none" stroke="var(--text-main)" stroke-width="1" stroke-linecap="round" opacity="0.6"/>
+      <!-- 1. Orange Twist -->
+      <g id="garnish-orange-twist">
+        <path d="M6,34 C12,18 20,8 32,8 C44,8 38,28 50,28 C58,28 62,18 68,14" fill="none" stroke="currentColor" stroke-width="5.5" stroke-linecap="round"/>
+        <path d="M6,34 C12,18 20,8 32,8 C44,8 38,28 50,28 C58,28 62,18 68,14" fill="none" stroke="#F1D88A" stroke-width="1.8" stroke-linecap="round" opacity="0.8"/>
       </g>
-      <g id="garnish-mint">
-        <path d="M 25 45 C 25 30, 25 15, 25 5" fill="none" stroke="var(--gold-sheen-2)" stroke-width="2" stroke-linecap="round"/>
-        <path d="M 25 12 C 20 6, 22 2, 25 2 C 28 2, 30 6, 25 12 Z" fill="none" stroke="var(--gold-sheen-2)" stroke-width="1.8"/>
-        <path d="M 25 22 C 12 18, 10 28, 25 30 Z" fill="none" stroke="var(--gold-sheen-2)" stroke-width="1.8"/>
-        <line x1="25" y1="24" x2="16" y2="22" stroke="var(--gold-sheen-2)" stroke-width="1"/>
-        <path d="M 25 28 C 38 24, 40 34, 25 36 Z" fill="none" stroke="var(--gold-sheen-2)" stroke-width="1.8"/>
-        <line x1="25" y1="30" x2="34" y2="28" stroke="var(--gold-sheen-2)" stroke-width="1"/>
+      <!-- 2. Lemon Twist -->
+      <g id="garnish-lemon-twist">
+        <path d="M12,48 C8,28 22,12 36,12 C52,12 50,38 34,42 C20,45 28,60 48,58" fill="none" stroke="currentColor" stroke-width="4.5" stroke-linecap="round"/>
+        <path d="M12,48 C8,28 22,12 36,12 C52,12 50,38 34,42" fill="none" stroke="#F1D88A" stroke-width="1.5" stroke-linecap="round" opacity="0.85"/>
       </g>
-      <g id="garnish-wheel">
-        <circle cx="25" cy="25" r="22" fill="none" stroke="var(--gold-sheen-2)" stroke-width="2.2"/>
-        <circle cx="25" cy="25" r="18" fill="none" stroke="var(--gold-sheen-2)" stroke-width="1.2" stroke-dasharray="2 2"/>
-        <circle cx="25" cy="25" r="4" fill="none" stroke="var(--gold-sheen-2)" stroke-width="1.5"/>
-        <line x1="25" y1="7" x2="25" y2="21" stroke="var(--gold-sheen-2)" stroke-width="1.4"/>
-        <line x1="25" y1="29" x2="25" y2="43" stroke="var(--gold-sheen-2)" stroke-width="1.4"/>
-        <line x1="7" y1="25" x2="21" y2="25" stroke="var(--gold-sheen-2)" stroke-width="1.4"/>
-        <line x1="29" y1="25" x2="43" y2="25" stroke="var(--gold-sheen-2)" stroke-width="1.4"/>
-        <line x1="12" y1="12" x2="22" y2="22" stroke="var(--gold-sheen-2)" stroke-width="1.2"/>
-        <line x1="38" y1="38" x2="28" y2="28" stroke="var(--gold-sheen-2)" stroke-width="1.2"/>
-        <line x1="12" y1="38" x2="22" y2="28" stroke="var(--gold-sheen-2)" stroke-width="1.2"/>
-        <line x1="38" y1="12" x2="28" y2="22" stroke="var(--gold-sheen-2)" stroke-width="1.2"/>
+      <!-- 3. Lime Wheel -->
+      <g id="garnish-lime-wheel">
+        <circle cx="32" cy="32" r="28" fill="none" stroke="currentColor" stroke-width="4"/>
+        <circle cx="32" cy="32" r="24" fill="none" stroke="currentColor" stroke-width="1.5" opacity="0.6"/>
+        <circle cx="32" cy="32" r="4.5" fill="currentColor"/>
+        <path d="M32,8 L32,56 M8,32 L56,32 M15,15 L49,49 M15,49 L49,15" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" opacity="0.75"/>
       </g>
+      <!-- 4. Lemon Wheel -->
+      <g id="garnish-lemon-wheel">
+        <circle cx="32" cy="32" r="28" fill="none" stroke="currentColor" stroke-width="4.5"/>
+        <circle cx="32" cy="32" r="23" fill="none" stroke="currentColor" stroke-width="1.2" opacity="0.6"/>
+        <circle cx="32" cy="32" r="4" fill="currentColor"/>
+        <path d="M32,9 L32,55 M9,32 L55,32 M16,16 L48,48 M16,48 L48,16" stroke="currentColor" stroke-width="1.5" opacity="0.7"/>
+        <circle cx="32" cy="32" r="14" fill="none" stroke="#F1D88A" stroke-width="1" stroke-dasharray="2 3" opacity="0.6"/>
+      </g>
+      <!-- 5. Dehydrated Orange Wheel -->
+      <g id="garnish-dehydrated-orange">
+        <circle cx="32" cy="32" r="27" fill="rgba(167,70,31,0.2)" stroke="currentColor" stroke-width="5"/>
+        <circle cx="32" cy="32" r="21" fill="none" stroke="currentColor" stroke-width="2" stroke-dasharray="3 2" opacity="0.8"/>
+        <circle cx="32" cy="32" r="5" fill="currentColor"/>
+        <path d="M32,11 L32,53 M11,32 L53,32 M17,17 L47,47 M17,47 L47,17" stroke="currentColor" stroke-width="2.2" opacity="0.85"/>
+      </g>
+      <!-- 6. Dehydrated Lemon Wheel -->
+      <g id="garnish-dehydrated-lemon">
+        <circle cx="32" cy="32" r="27" fill="rgba(216,180,90,0.15)" stroke="currentColor" stroke-width="4.2"/>
+        <circle cx="32" cy="32" r="22" fill="none" stroke="currentColor" stroke-width="1.5" opacity="0.75"/>
+        <circle cx="32" cy="32" r="4.5" fill="currentColor"/>
+        <path d="M32,10 L32,54 M10,32 L54,32 M17,17 L47,47 M17,47 L47,17" stroke="currentColor" stroke-width="1.8" stroke-dasharray="4 2" opacity="0.8"/>
+      </g>
+      <!-- 7. Cocktail Cherry -->
       <g id="garnish-cherry">
-        <circle cx="20" cy="32" r="12" fill="none" stroke="var(--gold-sheen-2)" stroke-width="2.2"/>
-        <path d="M 20 20 C 18 8, 32 6, 40 4" fill="none" stroke="var(--gold-sheen-2)" stroke-width="2" stroke-linecap="round"/>
-        <ellipse cx="16" cy="28" rx="3" ry="5" fill="var(--text-main)" opacity="0.4" transform="rotate(-30 16 28)"/>
+        <path d="M30,26 C31,12 42,4 52,6" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
+        <ellipse cx="28" cy="38" rx="16" ry="15" fill="currentColor"/>
+        <ellipse cx="23" cy="34" rx="4" ry="2.5" fill="#F1D88A" opacity="0.7" transform="rotate(-25 23 34)"/>
       </g>
+      <!-- 8. Maraschino Cherry Pair -->
+      <g id="garnish-cherry-pair">
+        <path d="M22,34 C24,18 36,10 46,14 C48,22 45,28 42,34" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
+        <circle cx="20" cy="40" r="13" fill="currentColor"/>
+        <circle cx="43" cy="38" r="12" fill="currentColor" opacity="0.9"/>
+        <circle cx="17" cy="36" r="3" fill="#F1D88A" opacity="0.75"/>
+      </g>
+      <!-- 9. Mint Sprig -->
+      <g id="garnish-mint">
+        <path d="M32,58 L32,16" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
+        <path d="M32,38 C20,36 14,24 22,18 C28,14 32,24 32,38 Z" fill="currentColor" opacity="0.85"/>
+        <path d="M32,34 C44,32 50,20 42,14 C36,10 32,20 32,34 Z" fill="currentColor" opacity="0.85"/>
+        <path d="M32,20 C24,10 30,4 32,4 C34,4 40,10 32,20 Z" fill="currentColor"/>
+      </g>
+      <!-- 10. Rosemary Sprig -->
       <g id="garnish-rosemary">
-        <line x1="25" y1="46" x2="25" y2="4" stroke="var(--gold-sheen-2)" stroke-width="2" stroke-linecap="round"/>
-        <line x1="25" y1="38" x2="15" y2="30" stroke="var(--gold-sheen-2)" stroke-width="1.6" stroke-linecap="round"/>
-        <line x1="25" y1="38" x2="35" y2="30" stroke="var(--gold-sheen-2)" stroke-width="1.6" stroke-linecap="round"/>
-        <line x1="25" y1="28" x2="14" y2="20" stroke="var(--gold-sheen-2)" stroke-width="1.6" stroke-linecap="round"/>
-        <line x1="25" y1="28" x2="36" y2="20" stroke="var(--gold-sheen-2)" stroke-width="1.6" stroke-linecap="round"/>
-        <line x1="25" y1="18" x2="16" y2="10" stroke="var(--gold-sheen-2)" stroke-width="1.6" stroke-linecap="round"/>
-        <line x1="25" y1="18" x2="34" y2="10" stroke="var(--gold-sheen-2)" stroke-width="1.6" stroke-linecap="round"/>
+        <path d="M32,60 L32,6" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
+        <path d="M32,48 L18,40 M32,48 L46,40 M32,38 L16,30 M32,38 L48,30 M32,28 L18,20 M32,28 L46,20 M32,18 L22,10 M32,18 L42,10" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
       </g>
+      <!-- 11. Green Olive -->
       <g id="garnish-olive">
-        <line x1="8" y1="42" x2="42" y2="8" stroke="var(--gold-sheen-2)" stroke-width="1.8" stroke-linecap="round"/>
-        <ellipse cx="25" cy="25" rx="10" ry="14" fill="none" stroke="var(--gold-sheen-2)" stroke-width="2" transform="rotate(45 25 25)"/>
-        <ellipse cx="22" cy="22" rx="3" ry="5" fill="var(--gold-sheen-2)" opacity="0.7" transform="rotate(45 22 22)"/>
-        <circle cx="44" cy="6" r="2.5" fill="var(--gold-sheen-2)"/>
+        <line x1="8" y1="56" x2="56" y2="8" stroke="#F1D88A" stroke-width="2.5" stroke-linecap="round"/>
+        <ellipse cx="32" cy="32" rx="14" ry="19" fill="currentColor" transform="rotate(-45 32 32)"/>
+        <circle cx="32" cy="32" r="4.5" fill="#A7461F"/>
+      </g>
+      <!-- 12. Cucumber Ribbon -->
+      <g id="garnish-cucumber">
+        <path d="M12,48 C16,28 32,26 36,36 C40,46 54,40 54,20" fill="none" stroke="currentColor" stroke-width="5" stroke-linecap="round"/>
+        <path d="M12,48 C16,28 32,26 36,36 C40,46 54,40 54,20" fill="none" stroke="#F1D88A" stroke-width="1.5" stroke-dasharray="3 3" opacity="0.75"/>
       </g>
     </defs>
   </svg>
 
   <div class="app-container">
 
-    <section id="menu-screen" class="app-screen screen-active" aria-label="Main Menu Screen">
-      <div class="menu-inner">
-        <header class="menu-brand-block">
-          <h1 class="menu-game-title">THE COUPE</h1>
-        </header>
-
-        <div class="today-hero-card glass-card">
-          <div class="hero-top-row">
-            <h2 class="hero-title">TODAY'S PUZZLE</h2>
-            <span id="menu-status-badge" class="hero-status-tag">LOADING</span>
-          </div>
-          <div class="hero-body">
-            <div class="hero-details">
-              <div class="hero-meta" id="menu-meta-container" style="display:none;">
-                <span id="menu-curriculum-label" class="badge"></span>
-                <span id="menu-difficulty-label" class="badge"></span>
-              </div>
-              <p id="menu-clue-snippet" class="hero-clue-preview">Verifying secure release connection...</p>
-            </div>
-          </div>
-          <button id="menu-play-btn" class="action-btn primary-gold" aria-label="Play Game" disabled>
-            <span id="menu-play-text" class="btn-text">PLEASE WAIT</span>
-          </button>
+    <!-- 1. MAIN MENU SCREEN -->
+    <section id="menu-screen" class="screen screen-active" aria-label="Main Menu">
+      <header class="menu-header">
+        <div class="menu-pre-title">
+          <span class="lounge-accent-line"></span>
+          <span class="lounge-tagline">The Reserve Collection</span>
+          <span class="lounge-accent-line"></span>
         </div>
-
-        <div class="menu-section-card glass-card">
-          <h2 class="section-card-title">VAULT</h2>
-          <button id="menu-vault-btn" class="action-btn secondary-glass" aria-label="Open Vault">OPEN</button>
-        </div>
-
-        <div class="menu-section-card glass-card">
-          <h2 class="section-card-title">86 HUB</h2>
-          <a href="https://tileworksgamesstudio.github.io/86/" class="action-btn secondary-glass link-btn" aria-label="Return to 86 Hub">VISIT</a>
-        </div>
-
-        <div class="menu-footer-actions">
-          <button id="menu-sound-btn" class="utility-btn" aria-label="Toggle Sound Effects">
-            <span id="menu-sound-icon" class="util-icon">🔊</span>
-            <span id="menu-sound-text" class="util-label">SOUND</span>
-          </button>
-          <button id="menu-stats-btn" class="utility-btn" aria-label="Open Stats">
-            <span class="util-icon">📊</span>
-            <span class="util-label">STATS</span>
-          </button>
-          <button id="menu-help-btn" class="utility-btn" aria-label="Rules">
-            <span class="util-icon">❓</span>
-            <span class="util-label">RULES</span>
-          </button>
-        </div>
-      </div>
-    </section>
-
-    <section id="game-screen" class="app-screen" aria-label="Active Game Screen">
-      <header class="game-header">
-        <div class="header-left">
-          <button id="back-to-menu-btn" class="nav-btn" aria-label="Menu">MENU</button>
-        </div>
-        <div class="brand-block">
-          <div id="game-day-label" class="day-indicator">DATE</div>
-        </div>
-        <div class="header-right">
-          <button id="game-vault-btn" class="nav-btn icon-only" aria-label="Vault"><span class="btn-icon">🗄️</span></button>
-          <button id="game-sound-btn" class="nav-btn icon-only" aria-label="Sound"><span id="game-sound-icon" class="btn-icon">🔊</span></button>
-        </div>
+        <h1 class="brand-title">HANGMAN</h1>
+        <p class="brand-subtitle">Crafted Wordplay &amp; Rare Lexicons</p>
       </header>
 
-      <main class="game-stage" id="game-stage">
-        <section class="clue-panel glass-card" aria-label="Clue">
-          <div class="clue-meta">
-            <span id="curriculum-badge" class="badge"></span>
-            <span id="difficulty-badge" class="badge"></span>
+      <nav class="primary-nav" aria-label="Main Navigation">
+        <!-- 1. Daily Puzzle -->
+        <article class="nav-card primary-card gold-border-sheen">
+          <div class="card-top">
+            <span class="eyebrow">Selection 01</span>
+            <span id="daily-status-tag" class="status-badge">Checking</span>
           </div>
-          <p id="puzzle-clue" class="clue-text"></p>
-        </section>
+          <h2 class="card-heading">Daily Puzzle</h2>
+          <p id="daily-card-clue" class="card-desc">Fetching today's challenge...</p>
+          <div class="card-footer">
+            <span id="daily-card-meta" class="meta-label"></span>
+            <button id="menu-play-btn" class="btn btn-primary" disabled>Play Daily</button>
+          </div>
+        </article>
 
-        <section class="visual-panel" aria-label="Apparatus">
-          <div class="apparatus-container glass-card">
-            <svg id="hangman-svg" viewBox="0 0 240 160" class="apparatus-svg" aria-hidden="true">
-              <rect x="25" y="146" width="75" height="8" rx="2" class="svg-bar gallows-base" />
-              <rect x="42" y="14" width="8" height="134" rx="2" class="svg-bar gallows-post" />
-              <rect x="42" y="14" width="105" height="8" rx="2" class="svg-bar gallows-beam" />
-              <line x1="44" y1="42" x2="72" y2="16" class="svg-strut" />
-              <line x1="140" y1="22" x2="140" y2="42" class="svg-rope" />
-              <g id="strike-1" class="strike-part" opacity="0">
-                <circle cx="140" cy="54" r="11" class="svg-head" />
-                <path d="M 132 46 Q 140 38 148 46 Q 140 50 132 46" class="svg-garnish" />
-              </g>
-              <g id="strike-2" class="strike-part" opacity="0">
-                <line x1="140" y1="65" x2="140" y2="102" class="svg-body" />
-                <polygon points="134,68 146,68 142,82 146,98 134,98 138,82" class="svg-jigger" />
-              </g>
-              <g id="strike-3" class="strike-part" opacity="0">
-                <line x1="140" y1="76" x2="114" y2="92" class="svg-limb" />
-                <circle cx="112" cy="94" r="3.2" class="svg-tool" />
-              </g>
-              <g id="strike-4" class="strike-part" opacity="0">
-                <line x1="140" y1="76" x2="166" y2="92" class="svg-limb" />
-                <circle cx="168" cy="94" r="4" class="svg-tool" />
-                <line x1="165" y1="90" x2="171" y2="98" class="svg-tool" />
-              </g>
-              <g id="strike-5" class="strike-part" opacity="0">
-                <line x1="140" y1="102" x2="120" y2="134" class="svg-limb" />
-                <rect x="114" y="132" width="10" height="4" rx="1" class="svg-foot" />
-              </g>
-              <g id="strike-6" class="strike-part" opacity="0">
-                <line x1="140" y1="102" x2="160" y2="134" class="svg-limb" />
-                <rect x="156" y="132" width="10" height="4" rx="1" class="svg-foot" />
-                <text x="135" y="126" class="svg-strike-text">86'D</text>
-              </g>
+        <!-- 2. Vault -->
+        <article class="nav-card">
+          <div class="card-top">
+            <span class="eyebrow">Selection 02</span>
+            <span id="vault-count-badge" class="status-badge badge-neutral">Archive</span>
+          </div>
+          <div class="card-middle-row">
+            <div>
+              <h2 class="card-heading">Vault</h2>
+              <p class="card-desc">Browse and replay past puzzles</p>
+            </div>
+            <button id="menu-vault-btn" class="btn btn-secondary">Open Vault</button>
+          </div>
+        </article>
+
+        <!-- 3. Home -->
+        <article class="nav-card">
+          <div class="card-top">
+            <span class="eyebrow">Selection 03</span>
+            <span class="status-badge badge-neutral">Portal</span>
+          </div>
+          <div class="card-middle-row">
+            <div>
+              <h2 class="card-heading">Home</h2>
+              <p class="card-desc">Return to the main game hub</p>
+            </div>
+            <a id="menu-home-btn" href="#" class="btn btn-secondary" aria-label="Go to Home Portal">Visit Home</a>
+          </div>
+        </article>
+      </nav>
+
+      <!-- Secondary Utility Controls -->
+      <footer class="menu-utility-bar">
+        <button id="menu-stats-btn" class="btn btn-ghost">Stats</button>
+        <span class="utility-divider" aria-hidden="true">◆</span>
+        <button id="menu-rules-btn" class="btn btn-ghost">How to Play</button>
+      </footer>
+    </section>
+
+    <!-- 2. VAULT SCREEN -->
+    <section id="vault-screen" class="screen" aria-label="Vault Archive">
+      <header class="view-header">
+        <button id="vault-back-btn" class="btn btn-secondary btn-icon-back" aria-label="Back to Menu">← Menu</button>
+        <h2 class="header-title">Vault Archive</h2>
+        <div class="header-placeholder" aria-hidden="true"></div>
+      </header>
+      <main class="vault-container">
+        <div id="vault-list" class="vault-list" role="list"></div>
+      </main>
+    </section>
+
+    <!-- 3. ACTIVE GAMEPLAY SCREEN -->
+    <section id="game-screen" class="screen" aria-label="Hangman Puzzle">
+      <header class="view-header">
+        <button id="game-back-btn" class="btn btn-secondary btn-icon-back" aria-label="Back to Menu">← Menu</button>
+        <h2 id="puzzle-title" class="header-title">Puzzle</h2>
+        <div class="header-placeholder" aria-hidden="true"></div>
+      </header>
+
+      <main class="gameplay-area">
+        <!-- TOP: Status Icons & Apparatus -->
+        <section class="apparatus-section" aria-label="Strike Counter">
+          <div class="visual-wrapper gold-border-sheen">
+            <svg id="hangman-svg" viewBox="0 0 140 135" class="gallows-svg" aria-hidden="true">
+              <!-- Structural Gilded Scaffold -->
+              <line x1="20" y1="125" x2="65" y2="125" class="scaffold base" />
+              <line x1="38" y1="125" x2="38" y2="15" class="scaffold mast" />
+              <line x1="38" y1="15" x2="96" y2="15" class="scaffold beam" />
+              <line x1="38" y1="36" x2="58" y2="15" class="scaffold brace" />
+              <line x1="96" y1="15" x2="96" y2="30" class="scaffold rope" />
+              <!-- Strikes (1 to 6) -->
+              <circle id="strike-1" cx="96" cy="42" r="11" class="body-part" />
+              <line id="strike-2" x1="96" y1="53" x2="96" y2="86" class="body-part" />
+              <line id="strike-3" x1="96" y1="64" x2="78" y2="78" class="body-part" />
+              <line id="strike-4" x1="96" y1="64" x2="114" y2="78" class="body-part" />
+              <line id="strike-5" x1="96" y1="86" x2="78" y2="112" class="body-part" />
+              <line id="strike-6" x1="96" y1="86" x2="114" y2="112" class="body-part" />
             </svg>
-            <div class="strike-status-wrap">
-              <span class="strike-label">STRIKES</span>
-              <div id="strike-pips" class="strike-pips" role="status">
-                <span class="pip" data-pip="1"></span><span class="pip" data-pip="2"></span>
-                <span class="pip" data-pip="3"></span><span class="pip" data-pip="4"></span>
-                <span class="pip" data-pip="5"></span><span class="pip" data-pip="6"></span>
-              </div>
-              <span id="strike-count" class="strike-number">0 / 6</span>
+            <div class="strikes-counter">
+              <span class="strikes-label">STRIKES</span>
+              <div id="strike-pips" class="strike-pips" aria-label="Strike indicators"></div>
+              <span id="strike-count-text" class="strikes-numeric">0 / 6</span>
             </div>
           </div>
         </section>
 
-        <section class="board-panel" aria-label="Word Board">
-          <div id="word-board" class="word-board" role="region" aria-live="polite"></div>
+        <!-- CENTER: The Star of the Screen (Game Board) -->
+        <section class="board-section" aria-label="Letter Board">
+          <div id="word-board" class="word-board" aria-live="polite"></div>
         </section>
 
-        <div id="sr-announcer" class="sr-only" aria-live="assertive"></div>
+        <!-- BOTTOM: Supporting Clue Text -->
+        <section class="clue-section" aria-label="Puzzle Clue">
+          <div class="clue-badge-wrapper">
+            <span id="game-category-tag" class="category-badge">Category</span>
+          </div>
+          <p id="game-clue-text" class="clue-caption"></p>
+        </section>
 
-        <section class="keyboard-panel" aria-label="Keyboard Input">
-          <div id="keyboard" class="virtual-keyboard"></div>
+        <!-- BOTTOM: Tactile Keyboard -->
+        <section class="keyboard-section" aria-label="Virtual Keyboard">
+          <div id="keyboard" class="keyboard-grid"></div>
         </section>
       </main>
     </section>
 
-    <!-- Modals -->
-    <div id="vault-modal" class="modal-backdrop" aria-hidden="true">
-      <div class="modal-dialog glass-card" role="dialog">
-        <div class="modal-header">
-          <h2 class="modal-title">VAULT</h2>
-          <button class="modal-close-btn" id="close-vault-btn" aria-label="Close">&times;</button>
-        </div>
-        <div class="modal-body">
-          <div id="vault-list" class="vault-grid"></div>
+    <!-- STATS MODAL -->
+    <dialog id="stats-modal" class="modal-window" aria-labelledby="stats-heading">
+      <div class="modal-surface gold-border-sheen">
+        <header class="modal-header">
+          <h2 id="stats-heading" class="modal-title">Player Statistics</h2>
+          <button class="modal-close" data-close aria-label="Close modal">&times;</button>
+        </header>
+        <div class="modal-content">
+          <div class="stats-overview-grid">
+            <div class="stat-card"><span id="stat-played" class="stat-val">0</span><span class="stat-lbl">Played</span></div>
+            <div class="stat-card"><span id="stat-win-rate" class="stat-val">0%</span><span class="stat-lbl">Win %</span></div>
+            <div class="stat-card"><span id="stat-streak" class="stat-val">0</span><span class="stat-lbl">Current</span></div>
+            <div class="stat-card"><span id="stat-max-streak" class="stat-val">0</span><span class="stat-lbl">Max</span></div>
+          </div>
+          <h3 class="modal-subtitle">Strike Distribution</h3>
+          <div id="strike-distribution-bars" class="distribution-bars"></div>
         </div>
       </div>
-    </div>
+    </dialog>
 
-    <div id="stats-modal" class="modal-backdrop" aria-hidden="true">
-      <div class="modal-dialog glass-card" role="dialog">
-        <div class="modal-header">
-          <h2 class="modal-title">STATS</h2>
-          <button class="modal-close-btn" id="close-stats-btn" aria-label="Close">&times;</button>
-        </div>
-        <div class="modal-body">
-          <div class="stats-scoreboard">
-            <div class="stat-card">
-              <span class="stat-val" id="stat-played">0</span>
-              <span class="stat-lbl">PLAYED</span>
-            </div>
-            <div class="stat-card">
-              <span class="stat-val" id="stat-win-rate">0%</span>
-              <span class="stat-lbl">WIN %</span>
-            </div>
-            <div class="stat-card">
-              <span class="stat-val" id="stat-streak">0</span>
-              <span class="stat-lbl">STREAK</span>
-            </div>
-            <div class="stat-card">
-              <span class="stat-val" id="stat-max-streak">0</span>
-              <span class="stat-lbl">MAX</span>
-            </div>
-          </div>
-          <div id="strike-bars" class="strike-bars"></div>
+    <!-- HOW TO PLAY MODAL -->
+    <dialog id="rules-modal" class="modal-window" aria-labelledby="rules-heading">
+      <div class="modal-surface gold-border-sheen">
+        <header class="modal-header">
+          <h2 id="rules-heading" class="modal-title">How to Play</h2>
+          <button class="modal-close" data-close aria-label="Close modal">&times;</button>
+        </header>
+        <div class="modal-content rules-body">
+          <ol class="rules-guide">
+            <li><strong>Objective:</strong> Guess the hidden word or phrase one letter at a time.</li>
+            <li><strong>Strikes:</strong> Each incorrect letter adds <strong>1 strike</strong>.</li>
+            <li><strong>Limit:</strong> The puzzle ends if you accumulate <strong>6 strikes</strong>.</li>
+            <li><strong>Schedule:</strong> A brand-new Daily Puzzle arrives every day at midnight.</li>
+          </ol>
         </div>
       </div>
-    </div>
+    </dialog>
 
-    <div id="result-modal" class="modal-backdrop" aria-hidden="true">
-      <div class="modal-dialog glass-card result-dialog" role="dialog">
-        <div class="modal-header result-header">
-          <h2 id="result-modal-title" class="modal-title">RESULT</h2>
-          <button class="modal-close-btn" id="close-result-btn" aria-label="Close">&times;</button>
-        </div>
-        <div class="modal-body">
-          <div class="revealed-phrase-box">
-            <div id="result-answer" class="revealed-phrase"></div>
+    <!-- RESULT MODAL -->
+    <dialog id="result-modal" class="modal-window" aria-labelledby="result-heading">
+      <div class="modal-surface gold-border-sheen">
+        <header class="modal-header">
+          <h2 id="result-heading" class="modal-title">Puzzle Complete</h2>
+          <button class="modal-close" data-close aria-label="Close modal">&times;</button>
+        </header>
+        <div class="modal-content result-body">
+          <div id="result-status-badge" class="result-banner">Solved</div>
+          <div class="solution-reveal">
+            <span class="solution-label">Solution</span>
+            <div id="result-answer" class="solution-text"></div>
           </div>
-          <div class="cocktail-field-notes glass-card">
-            <p id="result-lore" class="notes-body"></p>
+          <p id="result-note" class="result-caption"></p>
+          <div class="modal-action-row">
+            <button id="result-share-btn" class="btn btn-primary">Share Score</button>
+            <button id="result-menu-btn" class="btn btn-secondary">Menu</button>
           </div>
-          <div class="result-actions">
-            <button id="share-score-btn" class="action-btn primary-gold">SHARE</button>
-            <button id="result-menu-btn" class="action-btn secondary-glass">MENU</button>
-          </div>
-          <div id="toast-notify" class="toast-popup" aria-hidden="true">COPIED</div>
+          <div id="share-toast" class="toast-bubble" role="status" aria-live="polite">Result copied to clipboard</div>
         </div>
       </div>
-    </div>
-
-    <div id="help-modal" class="modal-backdrop" aria-hidden="true">
-      <div class="modal-dialog glass-card" role="dialog">
-        <div class="modal-header">
-          <h2 class="modal-title">RULES</h2>
-          <button class="modal-close-btn" id="close-help-btn" aria-label="Close">&times;</button>
-        </div>
-        <div class="modal-body help-body">
-          <ul class="rules-list">
-            <li>Uncover the secret bar term by guessing letters.</li>
-            <li>You are permitted 6 incorrect guesses.</li>
-            <li>Accrue 6 strikes before completing the term and the game ends.</li>
-            <li>A new puzzle releases automatically at UK midnight.</li>
-          </ul>
-        </div>
-      </div>
-    </div>
+    </dialog>
 
   </div>
+
+  <div id="screen-reader-feed" class="sr-only" aria-live="assertive"></div>
 
   <script src="./script.js"></script>
 </body>
