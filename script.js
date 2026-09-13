@@ -9,7 +9,7 @@
   const CONFIG = {
     csvPath: './puzzles.csv',
     maxStrikes: 6,
-    storageKey: 'universal_hangman_v1',
+    storageKey: 'cocktail_universal_hangman_v1',
     homeUrl: 'https://tileworksgamesstudio.github.io/86/' // Replace with supplied main-page URL
   };
 
